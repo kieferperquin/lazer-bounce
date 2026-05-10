@@ -1,6 +1,5 @@
 using UnityEngine;
 
-
 public class LazerPointer : MonoBehaviour
 {
     [SerializeField] private Material LazerMaterial;
@@ -27,7 +26,17 @@ public class LazerPointer : MonoBehaviour
             if (hit.collider)
             {
                 lr.SetPosition(1, hit.point);
-                hit.transform.gameObject.GetComponent<MirrorScript>().MirrorRay(LazerMaterial, hit.point);
+
+                // put mirror detection system in here so no error can happen
+
+                if (hit.collider.tag == "Mirror")
+                {
+                    hit.transform.gameObject.GetComponent<MirrorScript>().MirrorRay(LazerMaterial, hit, transform.position);
+                }
+                else if (hit.collider.tag == "LazerGoal")
+                {
+                    hit.transform.gameObject.GetComponent<LazerGoal>().CheckGoal(LazerMaterial);
+                }
             }
         }
         else
