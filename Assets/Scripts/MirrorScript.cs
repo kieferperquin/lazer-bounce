@@ -50,7 +50,7 @@ public class MirrorScript : MonoBehaviour
                 }
                 else if (hit.collider.CompareTag("LazerGoal"))
                 {
-                    hit.transform.gameObject.GetComponent<LazerGoal>().CheckGoal(segment.laserMaterial);
+                    hit.transform.gameObject.GetComponent<LaserGoal>().CheckGoal(segment.laserMaterial);
 
                     segment.DeleteNextSegment();
                 }

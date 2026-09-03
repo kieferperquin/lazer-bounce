@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LazerPointer : MonoBehaviour
+public class LaserPointer : MonoBehaviour
 {
     private LaserSegment segment;
     private LineRenderer lr;
@@ -43,7 +43,7 @@ public class LazerPointer : MonoBehaviour
                 }
                 else if (hit.collider.CompareTag("LazerGoal"))
                 {
-                    hit.transform.gameObject.GetComponent<LazerGoal>().CheckGoal(segment.laserMaterial);
+                    hit.transform.gameObject.GetComponent<LaserGoal>().CheckGoal(segment.laserMaterial);
 
                     segment.DeleteNextSegment();
                 }

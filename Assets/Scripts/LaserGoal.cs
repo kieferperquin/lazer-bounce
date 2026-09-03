@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public class LazerGoal : MonoBehaviour
+public class LaserGoal : MonoBehaviour
 {
-    [SerializeField] private Material lazerGoalMat;
+    [SerializeField] private Material laserGoalMat;
     
     public void CheckGoal(Material RayMat)
     {
-        if (lazerGoalMat == RayMat)
+        if (laserGoalMat == RayMat)
         {
             Debug.Log("goal");
         }
