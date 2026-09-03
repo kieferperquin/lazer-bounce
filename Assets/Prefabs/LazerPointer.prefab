@@ -100,6 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 747895643395374087}
   - component: {fileID: 8263027881403750026}
+  - component: {fileID: 7124061559394136609}
   - component: {fileID: 4471429871050003097}
   m_Layer: 0
   m_Name: LazerPointer
@@ -137,8 +138,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e74b2442bd8b5434297793e32a62916a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LazerPointer
-  LazerMaterial: {fileID: 2100000, guid: d1568c4fbe7a03342a4975eec2d3aff4, type: 2}
   lazer: {fileID: 8968713480953357200}
+--- !u!114 &7124061559394136609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6135533017526923825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09ff79c8be53ef340a43208409ce622a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LaserSegment
+  laserMaterial: {fileID: 0}
+  nextSegment: {fileID: 0}
 --- !u!120 &4471429871050003097
 LineRenderer:
   serializedVersion: 3
@@ -245,7 +259,7 @@ LineRenderer:
     textureMode: 0
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
-    generateLightingData: 0
+    generateLightingData: 1
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1

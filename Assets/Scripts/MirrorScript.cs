@@ -2,45 +2,32 @@ using UnityEngine;
 
 public class MirrorScript : MonoBehaviour
 {
-    private LineRenderer lr;
+    [SerializeField] private GameObject laserObject;
 
-    private float timer = 1;
-    private bool hasReset = false;
-
-    private void Awake()
+    public LaserSegment CreateNextSegment(Material material)
     {
-        lr = GetComponent<LineRenderer>();
+        GameObject createdObject = Instantiate(laserObject);
+
+        createdObject.transform.SetParent(transform, false);
+
+        createdObject.GetComponent<LineRenderer>().material = material;
+
+        LaserSegment segment = createdObject.GetComponent<LaserSegment>();
+
+        segment.laserMaterial = material;
+
+        return segment;
     }
 
-    private void Update()
+    public void UpdateLaser(RaycastHit oldHit, Vector3 laserOrigin, LaserSegment segment)
     {
-        if (!hasReset && timer <= 0f)
-        {
-            hasReset = true;
-            ResetRay();
-        }
-        else if (timer > 0)
-        {
-            timer -= .25f;
-        }
-    }
-
-    public void MirrorRay(Material LazerMaterial, RaycastHit oldHit, Vector3 laserOrigin)
-    {
-        timer = 1;
-        hasReset = false;
-
-        lr.material = LazerMaterial;
+        LineRenderer lr = segment.gameObject.GetComponent<LineRenderer>();
 
         Vector3 hitPoint = oldHit.point;
 
         lr.SetPosition(0, hitPoint);
 
-        Vector3 incomingDir = (hitPoint - laserOrigin).normalized;
-
-        Vector3 normal = oldHit.normal;
-
-        Vector3 reflectedDir = Vector3.Reflect(incomingDir, normal);
+        Vector3 reflectedDir = CalculateAngle(oldHit, laserOrigin);
 
         RaycastHit hit;
 
@@ -50,25 +37,41 @@ public class MirrorScript : MonoBehaviour
             {
                 lr.SetPosition(1, hit.point);
 
-                if (hit.collider.tag == "Mirror")
+                if (hit.collider.CompareTag("Mirror"))
                 {
-                    hit.transform.gameObject.GetComponent<MirrorScript>().MirrorRay(LazerMaterial, hit, transform.position);
+                    MirrorScript nextMirror = hit.collider.GetComponent<MirrorScript>();
+
+                    if (segment.nextSegment == null)
+                    {
+                        segment.CreateNextSegment(nextMirror);
+                    }
+
+                    segment.UpdateNextSegment(nextMirror, hit, hitPoint);
                 }
-                else if (hit.collider.tag == "LazerGoal")
+                else if (hit.collider.CompareTag("LazerGoal"))
                 {
-                    hit.transform.gameObject.GetComponent<LazerGoal>().CheckGoal(LazerMaterial);
+                    hit.transform.gameObject.GetComponent<LazerGoal>().CheckGoal(segment.laserMaterial);
+
+                    segment.DeleteNextSegment();
+                }
+                else
+                {
+                    segment.DeleteNextSegment();
                 }
             }
         }
         else
         {
             lr.SetPosition(1, hitPoint + reflectedDir * 5000);
+
+            segment.DeleteNextSegment();
         }
     }
 
-    public void ResetRay()
+    Vector3 CalculateAngle(RaycastHit oldHit, Vector3 laserOrigin)
     {
-        lr.SetPosition(0, Vector3.zero);
-        lr.SetPosition(1, Vector3.zero);
+        Vector3 incomingDir = (oldHit.point - laserOrigin).normalized;
+
+        return Vector3.Reflect(incomingDir, oldHit.normal);
     }
 }

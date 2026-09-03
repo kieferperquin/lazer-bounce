@@ -2,23 +2,26 @@ using UnityEngine;
 
 public class LazerPointer : MonoBehaviour
 {
-    [SerializeField] private Material LazerMaterial;
+    private LaserSegment segment;
+    private LineRenderer lr;
 
     public GameObject lazer;
 
-    private LineRenderer lr;
-
     void Start()
     {
+        segment = GetComponent<LaserSegment>();
+
         lr = GetComponent<LineRenderer>();
-        lazer.GetComponent<Renderer>().material = LazerMaterial;
-        lr.material = LazerMaterial;
+
+        lazer.GetComponent<Renderer>().material = segment.laserMaterial;
+        lr.material = segment.laserMaterial;
+
+        lr.SetPosition(0, lazer.transform.position);
+
     }
 
     void Update()
     {
-        lr.SetPosition(0, lazer.transform.position);
-
         RaycastHit hit;
 
         if (Physics.Raycast(transform.position, -transform.forward, out hit))
@@ -27,21 +30,34 @@ public class LazerPointer : MonoBehaviour
             {
                 lr.SetPosition(1, hit.point);
 
-                // put mirror detection system in here so no error can happen
+                if (hit.collider.CompareTag("Mirror"))
+                {
+                    MirrorScript nextMirror = hit.collider.GetComponent<MirrorScript>();
 
-                if (hit.collider.tag == "Mirror")
-                {
-                    hit.transform.gameObject.GetComponent<MirrorScript>().MirrorRay(LazerMaterial, hit, transform.position);
+                    if (segment.nextSegment == null)
+                    {
+                        segment.CreateNextSegment(nextMirror);
+                    }
+                    
+                    segment.UpdateNextSegment(nextMirror, hit, transform.position);
                 }
-                else if (hit.collider.tag == "LazerGoal")
+                else if (hit.collider.CompareTag("LazerGoal"))
                 {
-                    hit.transform.gameObject.GetComponent<LazerGoal>().CheckGoal(LazerMaterial);
+                    hit.transform.gameObject.GetComponent<LazerGoal>().CheckGoal(segment.laserMaterial);
+
+                    segment.DeleteNextSegment();
+                }
+                else
+                {
+                    segment.DeleteNextSegment();
                 }
             }
         }
         else
         {
             lr.SetPosition(1, -transform.forward * 5000);
+
+            segment.DeleteNextSegment();
         }
     }
 }
