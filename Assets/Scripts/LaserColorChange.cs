@@ -1,20 +1,27 @@
 using UnityEngine;
 
-public class MirrorScript : MonoBehaviour
+public class LaserColorChange : MonoBehaviour
 {
+    [SerializeField] private GameObject Lens;
     [SerializeField] private GameObject laserObject;
+    [SerializeField] private Material newLaserColor;
 
-    public LaserSegment CreateNextSegment(Material material)
+    private void Start()
+    {
+        Lens.GetComponent<Renderer>().material.color = new Color(newLaserColor.color.r, newLaserColor.color.g, newLaserColor.color.b, 0.4f);
+    }
+
+    public LaserSegment ColorChange()
     {
         GameObject createdObject = Instantiate(laserObject);
 
         createdObject.transform.SetParent(transform, false);
 
-        createdObject.GetComponent<LineRenderer>().material = material;
+        createdObject.GetComponent<LineRenderer>().material = newLaserColor;
 
         LaserSegment segment = createdObject.GetComponent<LaserSegment>();
 
-        segment.laserMaterial = material;
+        segment.laserMaterial = newLaserColor;
 
         return segment;
     }
@@ -27,11 +34,13 @@ public class MirrorScript : MonoBehaviour
 
         lr.SetPosition(0, hitPoint);
 
-        Vector3 reflectedDir = CalculateAngle(oldHit, laserOrigin);
+        Vector3 incomingDir = (hitPoint - laserOrigin).normalized;
 
         RaycastHit hit;
 
-        if (Physics.Raycast(hitPoint, reflectedDir, out hit))
+        Vector3 rayOrigin = hitPoint + incomingDir * 0.01f;
+
+        if (Physics.Raycast(rayOrigin, incomingDir, out hit))
         {
             if (hit.collider)
             {
@@ -48,7 +57,7 @@ public class MirrorScript : MonoBehaviour
                 }
                 else if (hit.collider.CompareTag("ColorChange"))
                 {
-                    if(segment.nextSegment == null)
+                    if (segment.nextSegment == null)
                     {
                         segment.CreateNewColorNextSegment(hit.collider.GetComponent<LaserColorChange>());
                     }
@@ -69,16 +78,9 @@ public class MirrorScript : MonoBehaviour
         }
         else
         {
-            lr.SetPosition(1, hitPoint + reflectedDir * 5000);
+            lr.SetPosition(1, hitPoint + incomingDir * 5000);
 
             segment.DeleteNextSegment();
         }
-    }
-
-    Vector3 CalculateAngle(RaycastHit oldHit, Vector3 laserOrigin)
-    {
-        Vector3 incomingDir = (oldHit.point - laserOrigin).normalized;
-
-        return Vector3.Reflect(incomingDir, oldHit.normal);
     }
 }

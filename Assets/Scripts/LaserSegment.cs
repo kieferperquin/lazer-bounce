@@ -10,9 +10,21 @@ public class LaserSegment : MonoBehaviour
         nextSegment = mirror.CreateNextSegment(laserMaterial);
     }
 
-    public void UpdateNextSegment(MirrorScript mirror, RaycastHit oldHit, Vector3 laserOrigin)
+    public void CreateNewColorNextSegment(LaserColorChange colorChange)
     {
-        mirror.UpdateLaser(oldHit, laserOrigin, nextSegment);
+        nextSegment = colorChange.ColorChange();
+    }
+
+    public void UpdateNextSegment(GameObject nextSegmentObject, RaycastHit oldHit, Vector3 laserOrigin)
+    {
+        if (nextSegmentObject.gameObject.CompareTag("Mirror"))
+        {
+            nextSegmentObject.GetComponent<MirrorScript>().UpdateLaser(oldHit, laserOrigin, nextSegment);
+        }
+        else if (nextSegmentObject.gameObject.CompareTag("ColorChange"))
+        {
+            nextSegmentObject.GetComponent<LaserColorChange>().UpdateLaser(oldHit, laserOrigin, nextSegment);
+        }
     }
 
     public void DeleteNextSegment()

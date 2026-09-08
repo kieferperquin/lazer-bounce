@@ -38,8 +38,17 @@ public class LaserPointer : MonoBehaviour
                     {
                         segment.CreateNextSegment(nextMirror);
                     }
-                    
-                    segment.UpdateNextSegment(nextMirror, hit, transform.position);
+
+                    segment.UpdateNextSegment(hit.collider.gameObject, hit, transform.position);
+                }
+                else if (hit.collider.CompareTag("ColorChange"))
+                {
+                    if (segment.nextSegment == null)
+                    {
+                        segment.CreateNewColorNextSegment(hit.collider.GetComponent<LaserColorChange>());
+                    }
+
+                    segment.UpdateNextSegment(hit.collider.gameObject, hit, transform.position);
                 }
                 else if (hit.collider.CompareTag("LazerGoal"))
                 {
